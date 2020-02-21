@@ -2,8 +2,8 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-
 const Users = require('./user-model')
+const authx = require('./middleware/authx')
 
 // register user endpoint
 router.post('/register', (req, res) => {
@@ -37,12 +37,22 @@ router.post('/login', (req, res) => {
             }
          })
          .catch(error => {
-            res.status(500).json({ message: 'Problems loggin you in.'})
+            res.status(500).json({ message: 'Unable to log in'})
          })
    } else {
       res.status(400).json({ message: 'Please provide a username and password' })
    }
 })
+
+router.get('/', authx, (req, res) => {
+  User.getUsers()
+     .then(users => {
+        res.status(200).json(users);
+     })
+     .catch(error => {
+        res.status(500).json({message: 'Connection to users not possible at this time'});
+     });
+});
 
 function signToken(user) {
    const payload = {

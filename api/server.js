@@ -1,11 +1,14 @@
-const express = require('express');
+const express = require('express')
+const users = require('./auth')
 
-const server = express();
+const server = express()
 
-server.use(express.json());
+server.use(express.json())
 
 server.get('/', (req, res) => {
-   res.send(`hello nurse!`);
-});
+   res.send(`hello nurse!`)
+})
 
-module.exports = server;
+server.use('/api/users', users)
+
+module.exports = server
