@@ -22,6 +22,8 @@ async function add(user) {
    return findById(id)
 }
 
-function findBy(filter) {
-   return db('users').where(filter)
+function findBy(username) {
+   console.log("find by", username)
+   return db('users')
+      .where(username)
 }

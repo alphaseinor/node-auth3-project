@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const Users = require('./user-model')
 const authx = require('./middleware/authx')
+const authz = require('./middleware/authz')
 
 // register user endpoint
 router.post('/register', (req, res) => {
@@ -26,8 +27,7 @@ router.post('/login', (req, res) => {
       Users.findBy({username})
          .then(user => {
             if (user && bcrypt.compareSync(password, user.password)) {
-               const token = signToken(user);
-               
+               const token = signToken(user)
                res.status(200).json({
                   token,
                    message: `Welcome ${username}` 
@@ -37,6 +37,7 @@ router.post('/login', (req, res) => {
             }
          })
          .catch(error => {
+            console.log("username not found")
             res.status(500).json({ message: 'Unable to log in'})
          })
    } else {
@@ -44,8 +45,8 @@ router.post('/login', (req, res) => {
    }
 })
 
-router.get('/', authx, (req, res) => {
-  User.getUsers()
+router.get('/', authx, authz, (req, res) => {
+  Users.getUsers()
      .then(users => {
         res.status(200).json(users);
      })
@@ -63,7 +64,7 @@ function signToken(user) {
    const secret = process.env.JWT_SECRET
 
    const options = {
-      expiresIn: '1hr'
+      expiresIn: '1h'
    }
 
    return jwt.sign(payload, secret, options)
